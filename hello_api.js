@@ -8,7 +8,42 @@
 
 
 const ghibli = "https://ghibliapi.herokuapp.com/films";
-const blah = "https://byabbe.se/on-this-day/10/27/events.json";
+const events = "https://byabbe.se/on-this-day/10/27/events.json";
+const randomCat = "https://aws.random.cat/meow";
+
+
+function objectToElement(thing)
+{
+    const item = document.createElement('div');
+    item.setAttribute('class', 'item');
+
+    /*
+    const p = document.createElement('p');
+    p.textContent = JSON.stringify(thing);
+    */
+
+    const table = document.createElement('table');
+    item.appendChild(table);
+        
+    for (let name in thing)
+    {
+        const tr = document.createElement('tr');
+        table.appendChild(tr);
+
+        const td_name = document.createElement('td');
+        td_name.textContent = name;
+        tr.appendChild(td_name);
+
+        const td_value = document.createElement('td');
+        td_value.textContent = JSON.stringify(thing[name]);
+        tr.appendChild(td_value);
+    }
+
+    item.appendChild(document.createElement("hr"));
+
+    return item;
+}
+
 
 function sendRequest(url)
 {
@@ -24,36 +59,18 @@ function sendRequest(url)
 
       var data = JSON.parse(this.response);
       if (request.status >= 200 && request.status < 400) {
-        data.forEach(thing => {
-          
-            const item = document.createElement('div');
-            item.setAttribute('class', 'item');
+          if (Array.isArray(data)) 
+          {
+            data.forEach(thing => {
+                let item = objectToElement(thing);
+                container.appendChild(item);
+            });
+          }
+          else
+          {
+            let item = objectToElement(data);
             container.appendChild(item);
-
-            /*
-            const p = document.createElement('p');
-            p.textContent = JSON.stringify(thing);
-            */
-
-            const table = document.createElement('table');
-            item.appendChild(table);
-                
-            for (let name in thing)
-            {
-                const tr = document.createElement('tr');
-                table.appendChild(tr);
-
-                const td_name = document.createElement('td');
-                td_name.textContent = name;
-                tr.appendChild(td_name);
-
-                const td_value = document.createElement('td');
-                td_value.textContent = thing[name];
-                tr.appendChild(td_value);
-            }
-
-            item.appendChild(document.createElement("hr"));
-        });
+          }
       } else {
         const errorMessage = document.createElement('marquee');
         errorMessage.textContent = `Gah, it's not working!`;
@@ -65,7 +82,8 @@ function sendRequest(url)
 }
 
 
+sendRequest(randomCat);
 sendRequest(ghibli);
-//sendRequest(blah);
+//sendRequest(events);
 
 
