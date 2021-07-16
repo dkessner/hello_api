@@ -1,5 +1,5 @@
 //
-// hello.js
+// hello_api.js
 //
 
 
@@ -8,7 +8,7 @@
 
 
 const ghibli = "https://ghibliapi.herokuapp.com/films";
-const events = "https://byabbe.se/on-this-day/10/27/events.json";
+const events = "https://byabbe.se/on-this-day/3/31/events.json";
 const randomCat = "https://aws.random.cat/meow";
 
 
@@ -45,45 +45,51 @@ function objectToElement(thing)
 }
 
 
-function sendRequest(url)
-{
-    const app = document.getElementById('root');
+const callback = function () {
+
+    const root = document.getElementById('root');
 
     const container = document.createElement('div');
     container.setAttribute('class', 'container');
-    app.appendChild(container);
+    root.appendChild(container);
 
-    var request = new XMLHttpRequest();
-    request.open('GET', url, true);
-    request.onload = function () {
+    var data = JSON.parse(this.response); // this === XMLHttpRequest object
 
-      var data = JSON.parse(this.response);
-      if (request.status >= 200 && request.status < 400) {
-          if (Array.isArray(data)) 
-          {
+    if (this.status >= 200 && this.status < 400) 
+    {
+        if (Array.isArray(data)) 
+        {
             data.forEach(thing => {
                 let item = objectToElement(thing);
                 container.appendChild(item);
             });
-          }
-          else
-          {
+        }
+        else
+        {
             let item = objectToElement(data);
             container.appendChild(item);
-          }
-      } else {
+        }
+    } 
+    else 
+    {
         const errorMessage = document.createElement('marquee');
         errorMessage.textContent = `Gah, it's not working!`;
         app.appendChild(errorMessage);
-      }
     }
+}
 
+
+function sendRequest(url)
+{
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.onload = callback;
     request.send();
 }
 
 
 sendRequest(randomCat);
 sendRequest(ghibli);
-//sendRequest(events);
+sendRequest(events);
 
 
